@@ -30,6 +30,17 @@ public class MainDriver {
 					return GithubSubscribe.followUser(ctx, githubUsername);
 				case Constants.HELP:
 					return ctx.ack(Help.getHelpText());
+
+				case Constants.PING:
+					if (commandArgs.length < 3) {
+						return ctx.ack("Error: Must provide a comma separated list of names and link to PR");
+					}
+
+					String result = Ping.pingForReview(ctx, commandArgs[1], commandArgs[2]);
+					if(result.length() > 0){
+						return ctx.ack(result);
+					}
+					return ctx.ack();
 				default:
 					return ctx.ack("Invalid command: " + commandArgs[0]);
 			}

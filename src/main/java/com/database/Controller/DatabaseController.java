@@ -39,7 +39,7 @@ public class DatabaseController {
 		return getDatabaseInstancePrPal().getCollection(COLLECTION_NAME_USERS);
 	}
 
-	public void saveUser(Document newDocument) {
+	public void createUser(Document newDocument) {
 		getUsersCollection().insertOne(newDocument);
 	}
 

@@ -15,6 +15,7 @@ public class SlackApp {
 
 		app.command("/prpal", (req, ctx) -> {
 			String payload = req.getPayload().getText();
+			String slackUserId = req.getPayload().getUserId();
 
 			if (payload == null) {
 				return ctx.ack("Error: Must provide at least one argument to PrPal");
@@ -23,18 +24,19 @@ public class SlackApp {
 			String[] commandArgs = req.getPayload().getText().split(" ");
 			System.out.println(commandArgs[0].toUpperCase());
 			switch(commandArgs[0].toUpperCase()) {
+
 				case Constants.SUBSCRIBE:
 					if (commandArgs.length < 2) {
 						return ctx.ack("Error: Must provide the repository name as the second argument");
 					}
 					String repositoryName = commandArgs[1];
-					return GithubSubscribe.subscribeToRepository(ctx, repositoryName);
+					return GithubSubscribe.subscribeToRepository(ctx, repositoryName, slackUserId);
 				case Constants.FOLLOW:
 					if (commandArgs.length < 2) {
 						return ctx.ack("Error: Must provide a Github username as the second argument");
 					}
 					String githubUsername = commandArgs[1];
-					return GithubSubscribe.followUser(ctx, githubUsername);
+					return GithubSubscribe.followUser(ctx, githubUsername, slackUserId);
 				case Constants.HELP:
 					return ctx.ack(Help.getHelpText());
 				case Constants.PING:

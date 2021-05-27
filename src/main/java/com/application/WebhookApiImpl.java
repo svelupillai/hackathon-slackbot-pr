@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.application.webhookEvents.BaseEvent;
 import com.application.webhookEvents.PullRequestEvent;
 import com.application.webhookEvents.PullRequestReviewCommentEvent;
+import com.application.webhookEvents.PullRequestReviewEvent;
 import com.google.gson.Gson;
 
 @Controller
@@ -29,6 +30,8 @@ public class WebhookApiImpl {
 			evnt = new Gson().fromJson(json, PullRequestEvent.class);
 		if (jsonObject.has("comment"))
 			evnt = new Gson().fromJson(json, PullRequestReviewCommentEvent.class);
+		if (jsonObject.has("review"))
+			evnt = new Gson().fromJson(json, PullRequestReviewEvent.class);
 
 		if (evnt != null)
 			System.out.println(evnt);

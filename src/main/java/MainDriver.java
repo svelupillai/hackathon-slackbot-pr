@@ -4,11 +4,11 @@ import com.slack.api.bolt.jetty.SlackAppServer;
 public class MainDriver {
 
     public static void main(String[] args) throws Exception {
-        App app = new App();
+        var app = new App();
 
         // All the room in the world for your code
 
-        SlackAppServer server = new SlackAppServer(app);
+        var server = new SlackAppServer(app);
         server.start();
     }
 }

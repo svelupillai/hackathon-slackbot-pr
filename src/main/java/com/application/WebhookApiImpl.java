@@ -28,8 +28,10 @@ public class WebhookApiImpl {
 		if (jsonObject.has("number"))
 			evnt = new Gson().fromJson(json, PullRequestEvent.class);
 		if (jsonObject.has("comment"))
+			evnt = new Gson().fromJson(json, PullRequestReviewCommentEvent.class);
 
-		System.out.println(evnt);
+		if (evnt != null)
+			System.out.println(evnt);
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 

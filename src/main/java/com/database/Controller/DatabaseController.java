@@ -1,5 +1,8 @@
 package com.database.Controller;
 
+import static com.database.Util.Constants.COLLECTION_NAME_USERS;
+import static com.database.Util.Constants.DATABASE_NAME_PR_PAL;
+import static com.database.Util.Constants.OPERATION_SET;
 import static com.mongodb.client.model.Filters.eq;
 import static com.database.Util.Constants.DB_FIELD_USER_ID;
 
@@ -15,14 +18,8 @@ import com.mongodb.client.MongoDatabase;
 
 public class DatabaseController {
 
-	private static final String DATABASE_NAME_PR_PAL = "prPal";
-	private static String COLLECTION_NAME_USERS = "users";
-
-	private static String OPERATION_SET = "$set";
-
 	private static MongoClient mongoClient;
 	private static MongoDatabase mongoDatabase;
-	private static MongoCollection<Document> mongoCollection;
 
 	public DatabaseController() {
 		mongoClient = getClientInstance();

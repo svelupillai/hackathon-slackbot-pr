@@ -1,3 +1,5 @@
+package com.application;
+
 import com.slack.api.bolt.context.builtin.SlashCommandContext;
 import com.slack.api.bolt.response.Response;
 

@@ -21,5 +21,4 @@ public class DatabaseController {
 		return Objects.isNull(mongoClient) ? new MongoClient() : mongoClient;
 	}
 
-
 }

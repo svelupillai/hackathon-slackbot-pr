@@ -3,8 +3,8 @@ import com.slack.api.bolt.jetty.SlackAppServer;
 
 public class MainDriver {
 
-    public static void main(String[] args) throws Exception {
-        var app = new App();
+	public static void main(String[] args) throws Exception {
+		var app = new App();
 
 		app.command("/prpal", (req, ctx) -> {
 			String payload = req.getPayload().getText();
@@ -35,7 +35,7 @@ public class MainDriver {
 			}
 		});
 
-        var server = new SlackAppServer(app);
-        server.start();
-    }
+		var server = new SlackAppServer(app);
+		server.start();
+	}
 }

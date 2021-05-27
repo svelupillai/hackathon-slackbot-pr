@@ -61,4 +61,50 @@ public class GithubSubscribe {
 
 		return ctx.ack( "Successfully following Github user " + username);
 	}
+
+	public static Response getSubscribedRepos(SlashCommandContext ctx, String userId) {
+		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		if(user == null || user.getSubscribedRepoIds() == null) {
+			return ctx.ack("You are not subscribed to any repos.");
+		}
+		return ctx.ack(String.format("You are subscribed to the following repos: %s", String.join(",", user.getSubscribedRepoIds())));
+	}
+
+	public static Response getFollowedUsers(SlashCommandContext ctx, String userId) {
+		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		if(user == null || user.getSubscribedUserIds() == null) {
+			return ctx.ack("You are not following any users.");
+		}
+		return ctx.ack(String.format("You are following these users: %s", String.join(",", user.getSubscribedUserIds())));
+	}
+
+	public static Response unSubscribeRepo(SlashCommandContext ctx, String userId, String repo){
+		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		if(user == null || user.getSubscribedRepoIds() == null) {
+			return ctx.ack("You are not subscribed to any repos.");
+		}
+		List<String> subscribedRepos = user.getSubscribedRepoIds();
+		if(!subscribedRepos.contains(repo)){
+			return ctx.ack(String.format("You are not subscribed to %s.",repo));
+		}
+		subscribedRepos.remove(repo);
+		databaseController.updateUser(userId, UserAdapter.userToDocument(user));
+		return ctx.ack(String.format("You have successfully unsubscribed to %s",repo));
+
+	}
+
+	public static Response unFollowUser(SlashCommandContext ctx, String userId, String userToUnfollow){
+		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		if(user == null || user.getSubscribedUserIds() == null) {
+			return ctx.ack("You are not following any users.");
+		}
+		List<String> followedUsers = user.getSubscribedUserIds();
+		if(!followedUsers.contains(userToUnfollow)){
+			return ctx.ack(String.format("You are not following %s.",userToUnfollow));
+		}
+		followedUsers.remove(userToUnfollow);
+		databaseController.updateUser(userId, UserAdapter.userToDocument(user));
+		return ctx.ack(String.format("You have successfully unfollowed to %s",userToUnfollow));
+
+	}
 }

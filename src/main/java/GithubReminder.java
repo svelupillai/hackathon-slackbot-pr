@@ -19,7 +19,7 @@ public class GithubReminder {
 			hrs = Integer.parseInt(hours);
 			mins = Integer.parseInt(minutes);
 		} catch (NumberFormatException e) {
-			return ctx.ack(String.format("Error: invalid number [%s]", minutes));
+			return ctx.ack(String.format("Error: invalid number [%s]", e.getMessage()));
 		}
 
 		RemindersAddResponse response = ctx.client().remindersAdd(RemindersAddRequest.builder()

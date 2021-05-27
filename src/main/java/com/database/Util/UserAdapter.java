@@ -1,12 +1,12 @@
-package mongo.Util;
+package com.database.Util;
 
-import static mongo.Util.Constants.*;
+import static com.database.Util.Constants.*;
 
 import java.util.List;
 
 import org.bson.Document;
 
-import mongo.Model.User;
+import com.database.Model.User;
 
 public class UserAdapter {
 

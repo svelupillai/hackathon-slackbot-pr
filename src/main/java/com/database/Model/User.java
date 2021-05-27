@@ -1,4 +1,4 @@
-package mongo.Model;
+package com.database.Model;
 
 import java.util.List;
 

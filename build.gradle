@@ -22,17 +22,8 @@ dependencies {
   implementation 'org.projectlombok:lombok:1.18.16'
   compile ('org.mongodb:mongo-java-driver:3.12.8')
 }
-application {
-  mainClassName = "MainDriver"
-}
 
 java {
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
-}
-
-
-run {
-  // gradle run -DslackLogLevel=debug
-  systemProperty "org.slf4j.simpleLogger.log.com.slack.api", System.getProperty("slackLogLevel")
 }

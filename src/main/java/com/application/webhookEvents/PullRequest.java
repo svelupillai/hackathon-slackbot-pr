@@ -10,7 +10,7 @@ public class PullRequest {
 	private String closed_at;
 	private String merged_at;
 	private Boolean draft;
-	private String merged_by;
+	private User merged_by;
 	private Integer comments;
 	private Integer review_comments;
 	private Integer commits;
@@ -80,11 +80,11 @@ public class PullRequest {
 		this.draft = draft;
 	}
 
-	public String getMergedBy(){
+	public User getMergedBy(){
 		return this.merged_by;
 	}
 
-	public void setMergedBy(String merged_by){
+	public void setMergedBy(User merged_by){
 		this.merged_by = merged_by;
 	}
 

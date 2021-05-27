@@ -1,3 +1,5 @@
+package com.application;
+
 public class Constants {
 
 	// PrPal commands

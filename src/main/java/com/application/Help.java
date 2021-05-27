@@ -1,3 +1,5 @@
+package com.application;
+
 public class Help {
 
 	public static String getHelpText() {

@@ -13,13 +13,9 @@ import com.slack.api.bolt.response.Response;
 
 public class GithubSubscribe {
 
-	private static DatabaseController databaseController;
+	private static DatabaseController databaseController = new DatabaseController();;
 
 	public static Response subscribeToRepository(SlashCommandContext ctx, String repositoryName, String slackUserId) {
-		// TODO Call GH API to subscribe to repository and persist in db
-
-		//Persist subscription in database
-		databaseController = new DatabaseController();
 		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser(slackUserId));
 
 		if(Objects.isNull(userQueried)){
@@ -27,15 +23,12 @@ public class GithubSubscribe {
 			User newUser = new User();
 			newUser.setUserId(slackUserId);
 
-			List<String> subscribedRepoIds = new ArrayList<>();
-			subscribedRepoIds.add(repositoryName);
-			newUser.setSubscribedRepoIds(subscribedRepoIds);
+			newUser.setSubscribedRepoIds(List.of(repositoryName));
 
 			databaseController.createUser(UserAdapter.userToDocument(newUser));
 		} else {
 			//Get user + Update with new repo name
-			List<String> subscribedRepoIds = userQueried.getSubscribedRepoIds();
-			subscribedRepoIds = Optional.ofNullable(subscribedRepoIds)
+			List<String> subscribedRepoIds = Optional.ofNullable(userQueried.getSubscribedRepoIds())
 				.orElse(new ArrayList<>());
 			subscribedRepoIds.add(repositoryName);
 			userQueried.setSubscribedRepoIds(subscribedRepoIds);
@@ -47,26 +40,18 @@ public class GithubSubscribe {
 	}
 
 	public static Response followUser(SlashCommandContext ctx, String username, String slackUserId) {
-		// TODO Call GH API to follow a user's activity and persist in db
-
-		//Persist subscription in database
-		databaseController = new DatabaseController();
 		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser(slackUserId));
 
 		if(Objects.isNull(userQueried)){
 			//Create new user
 			User newUser = new User();
 			newUser.setUserId(slackUserId);
-
-			List<String> followedUserIds = new ArrayList<>();
-			followedUserIds.add(username);
-			newUser.setSubscribedUserIds(followedUserIds);
+			newUser.setSubscribedUserIds(List.of(username));
 
 			databaseController.createUser(UserAdapter.userToDocument(newUser));
 		} else {
 			//Get user + Update with new repo name
-			List<String> subscribedUserIds = userQueried.getSubscribedUserIds();
-			subscribedUserIds = Optional.ofNullable(subscribedUserIds)
+			List<String> subscribedUserIds = Optional.ofNullable(userQueried.getSubscribedUserIds())
 				.orElse(new ArrayList<>());
 			subscribedUserIds.add(username);
 			userQueried.setSubscribedUserIds(subscribedUserIds);

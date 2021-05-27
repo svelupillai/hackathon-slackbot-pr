@@ -54,6 +54,20 @@ public class SlackApp {
 						return ctx.ack("Error: Must provide command in the format: remind <PR_LINK> <hours> <minutes>");
 					}
 					return GithubReminder.remind(ctx, USER_TOKEN, commandArgs[1], commandArgs[2], commandArgs[3]);
+				case Constants.REPOS:
+					return GithubSubscribe.getSubscribedRepos(ctx, req.getPayload().getUserId());
+				case Constants.USERS:
+					return GithubSubscribe.getFollowedUsers(ctx, req.getPayload().getUserId());
+				case Constants.UNSUBSCRIBE:
+					if (commandArgs.length < 2) {
+						return ctx.ack("Error: Must provide the repository name as the second argument");
+					}
+					return GithubSubscribe.unSubscribeRepo(ctx, req.getPayload().getUserId(), commandArgs[1]);
+				case Constants.UNFOLLOW:
+					if (commandArgs.length < 2) {
+						return ctx.ack("Error: Must provide a Github username as the second argument");
+					}
+					return GithubSubscribe.unFollowUser(ctx, req.getPayload().getUserId(), commandArgs[1]);
 				default:
 					return ctx.ack("Invalid command: " + commandArgs[0]);
 			}

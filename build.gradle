@@ -19,6 +19,7 @@ dependencies {
   implementation 'com.google.code.gson:gson:2.8.7'
   implementation("com.slack.api:bolt-jetty:1.8.0")
   implementation("org.slf4j:slf4j-simple:1.7.30")
+  implementation 'org.projectlombok:lombok:1.18.16'
   compile ('org.mongodb:mongo-java-driver:3.12.8')
 }
 application {

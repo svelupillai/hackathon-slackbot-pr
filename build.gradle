@@ -17,9 +17,21 @@ dependencies {
   implementation 'com.squareup.okhttp3:okhttp:4.9.1'
   implementation 'com.slack.api:bolt-servlet:1.8.0'
   implementation 'com.google.code.gson:gson:2.8.7'
+  implementation("com.slack.api:bolt-jetty:1.8.0")
+  implementation("org.slf4j:slf4j-simple:1.7.30")
+  compile ('org.mongodb:mongo-java-driver:3.12.8')
+}
+application {
+  mainClassName = "MainDriver"
 }
 
 java {
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
+}
+
+
+run {
+  // gradle run -DslackLogLevel=debug
+  systemProperty "org.slf4j.simpleLogger.log.com.slack.api", System.getProperty("slackLogLevel")
 }

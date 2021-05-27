@@ -17,6 +17,7 @@ dependencies {
   implementation 'com.squareup.okhttp3:okhttp:4.9.1'
   implementation 'com.slack.api:bolt-servlet:1.8.0'
   implementation 'com.google.code.gson:gson:2.8.7'
+  compile ('org.mongodb:mongo-java-driver:3.12.8')
 }
 
 java {

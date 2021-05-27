@@ -1,6 +1,6 @@
 package com.application.webhookEvents;
 
-public class Sender {
+public class User {
 
 	private String login;
 

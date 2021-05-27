@@ -7,5 +7,6 @@ public class Constants {
 	public static final String FOLLOW = "FOLLOW";
 	public static final String HELP = "HELP";
 	public static final String PING = "PING";
+	public static final String REMIND = "REMIND";
 
 }

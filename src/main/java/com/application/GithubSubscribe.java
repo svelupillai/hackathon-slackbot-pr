@@ -15,17 +15,17 @@ public class GithubSubscribe {
 
 	private static DatabaseController databaseController;
 
-	public static Response subscribeToRepository(SlashCommandContext ctx, String repositoryName) {
+	public static Response subscribeToRepository(SlashCommandContext ctx, String repositoryName, String slackUserId) {
 		// TODO Call GH API to subscribe to repository and persist in db
 
 		//Persist subscription in database
 		databaseController = new DatabaseController();
-		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser("userId"));
+		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser(slackUserId));
 
 		if(Objects.isNull(userQueried)){
 			//Create new user
 			User newUser = new User();
-			newUser.setUserId("userId"); //TODO: Remove hardcoded param, use real id from req object (apply everywhere in this class)
+			newUser.setUserId(slackUserId);
 
 			List<String> subscribedRepoIds = new ArrayList<>();
 			subscribedRepoIds.add(repositoryName);
@@ -40,23 +40,23 @@ public class GithubSubscribe {
 			subscribedRepoIds.add(repositoryName);
 			userQueried.setSubscribedRepoIds(subscribedRepoIds);
 
-			databaseController.updateUser("userId", UserAdapter.userToDocument(userQueried));
+			databaseController.updateUser(slackUserId, UserAdapter.userToDocument(userQueried));
 		}
 
 		return ctx.ack( "Successfully subscribed to repository " + repositoryName);
 	}
 
-	public static Response followUser(SlashCommandContext ctx, String username) {
+	public static Response followUser(SlashCommandContext ctx, String username, String slackUserId) {
 		// TODO Call GH API to follow a user's activity and persist in db
 
 		//Persist subscription in database
 		databaseController = new DatabaseController();
-		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser("userId"));
+		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser(slackUserId));
 
 		if(Objects.isNull(userQueried)){
 			//Create new user
 			User newUser = new User();
-			newUser.setUserId("userId"); //TODO: Remove hardcoded param, use real id from req object (apply everywhere in this class)
+			newUser.setUserId(slackUserId);
 
 			List<String> followedUserIds = new ArrayList<>();
 			followedUserIds.add(username);
@@ -71,7 +71,7 @@ public class GithubSubscribe {
 			subscribedUserIds.add(username);
 			userQueried.setSubscribedUserIds(subscribedUserIds);
 
-			databaseController.updateUser("userId", UserAdapter.userToDocument(userQueried));
+			databaseController.updateUser(slackUserId, UserAdapter.userToDocument(userQueried));
 		}
 
 		return ctx.ack( "Successfully following Github user " + username);

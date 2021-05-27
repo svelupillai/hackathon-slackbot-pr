@@ -64,7 +64,7 @@ public class GithubSubscribe {
 
 	public static Response getSubscribedRepos(SlashCommandContext ctx, String userId) {
 		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
-		if(user == null || user.getSubscribedRepoIds() == null) {
+		if(user == null || user.getSubscribedRepoIds() == null || user.getSubscribedRepoIds().size() == 0) {
 			return ctx.ack("You are not subscribed to any repos.");
 		}
 		return ctx.ack(String.format("You are subscribed to the following repos: %s", String.join(",", user.getSubscribedRepoIds())));
@@ -72,7 +72,7 @@ public class GithubSubscribe {
 
 	public static Response getFollowedUsers(SlashCommandContext ctx, String userId) {
 		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
-		if(user == null || user.getSubscribedUserIds() == null) {
+		if(user == null || user.getSubscribedUserIds() == null || user.getSubscribedUserIds().size() == 0) {
 			return ctx.ack("You are not following any users.");
 		}
 		return ctx.ack(String.format("You are following these users: %s", String.join(",", user.getSubscribedUserIds())));

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import com.application.webhookEvents.BaseEvent;
 import com.application.webhookEvents.EventAction;
 import com.application.webhookEvents.PullRequestEvent;
+import com.application.webhookEvents.PullRequestReviewCommentEvent;
 import com.google.gson.Gson;
 
 @Controller
@@ -23,14 +24,13 @@ public class WebhookApiImpl {
 		// do some magic!
 		String json = httpEntity.getBody();
 		EventAction action = new Gson().fromJson(json, EventAction.class);
-		BaseEvent evnt;
+		BaseEvent evnt = null;
 		switch (action.getAction()){
 			case "assigned":
 			case "auto_merge_disabled":
 			case "auto_merge_enabled":
 			case "closed":
 			case "converted_to_draft":
-			case "edited":
 			case "labeled":
 			case "locked":
 			case "opened":
@@ -44,9 +44,13 @@ public class WebhookApiImpl {
 			case "unlocked":
 				evnt = new Gson().fromJson(json, PullRequestEvent.class);
 				break;
-			default:
-				throw new IllegalStateException("Unexpected value: " + action.getAction());
+			case "created":
+			case "edited":
+			case "deleted":
+				evnt = new Gson().fromJson(json, PullRequestReviewCommentEvent.class);
+				break;
 		}
+
 		System.out.println(evnt);
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}

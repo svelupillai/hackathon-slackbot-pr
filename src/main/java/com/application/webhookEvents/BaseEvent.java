@@ -3,7 +3,7 @@ package com.application.webhookEvents;
 public abstract class BaseEvent {
 
 	private String action;
-	private Sender sender;
+	private User sender;
 	private Repository repository;
 	private Object organization;
 	private Object installation;
@@ -16,11 +16,11 @@ public abstract class BaseEvent {
 		this.action = action;
 	}
 
-	public Sender GetSender(){
+	public User GetUser(){
 		return sender;
 	}
 
-	public void SetSender(Sender sender){
+	public void SetUser(User sender){
 		this.sender = sender;
 	}
 

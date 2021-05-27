@@ -14,7 +14,7 @@ public class Ping {
     static Map<String, String> env = System.getenv();
     static String value = env.get("SLACK_BOT_TOKEN");
 
-    public static String pingForReview(SlashCommandContext ctx, String requestNames) throws IOException, SlackApiException {
+    public static String pingForReview(SlashCommandContext ctx, String requestNames, String prLink) throws IOException, SlackApiException {
         StringBuilder failedNames = new StringBuilder();
 
         if (requestNames == null || requestNames.trim().length() == 0){
@@ -29,8 +29,7 @@ public class Ping {
             if(user != null) {
                 ChatPostMessageResponse response = ctx.client().chatPostMessage(r -> r
                         .channel(user.getId())
-                        .username(name)
-                        .text(":wave: Your review is being requested.")
+                        .text(String.format(":wave: Your review is being requested on %s.", prLink))
                 );
             }
             else {

@@ -48,25 +48,35 @@ public class GithubReminder {
 			return ctx.ack("Error getting reminders");
 		}
 
+		// No reminders at all
 		if (remindersListResponse.getReminders().isEmpty()) {
-			return ctx.ack("You have no reminders set up.");
+			return ctx.ack("You have no PR review reminders set up.");
 		}
 
-		List<String> reminders = new ArrayList<>();
+		List<String> prReviewReminders = new ArrayList<>();
 
 		for (Reminder reminder : remindersListResponse.getReminders()) {
+			if (reminder.getText() == null || !reminder.getText().contains("Review the PR")) {
+				continue;
+			}
+
 			if (!reminder.isRecurring()) {
 				String reminderText = String.format("%s on %s", reminder.getText(), getDateFromTimestamp(reminder.getTime()));
 				if (reminder.getCompleteTs() > 0) {
 					reminderText += String.format(" *Marked complete on %s*", getDateFromTimestamp(reminder.getCompleteTs()));
 				}
-				reminders.add(reminderText);
+				prReviewReminders.add(reminderText);
 			} else {
-				reminders.add(String.format("Recurring reminder: %s", reminder.getText()));
+				prReviewReminders.add(String.format("Recurring reminder: %s", reminder.getText()));
 			}
 		}
 
-		return ctx.ack("Here are your PR review reminders:\n" + String.join("\n", reminders));
+		// Have other reminders but no PR review ones
+		if (prReviewReminders.isEmpty()) {
+			return ctx.ack("You have no PR review reminders set up.");
+		}
+
+		return ctx.ack("Here are your PR review reminders:\n" + String.join("\n", prReviewReminders));
 	}
 
 	public static Response deleteAllReminders(SlashCommandContext ctx, String userToken) throws SlackApiException, IOException {
@@ -76,16 +86,29 @@ public class GithubReminder {
 			return ctx.ack("Error getting reminders");
 		}
 
+		// No reminders at all
 		if (remindersListResponse.getReminders().isEmpty()) {
-			return ctx.ack("You have no reminders set up.");
+			return ctx.ack("You have no PR review reminders set up.");
 		}
 
+		int deleted = 0;
+
 		for (Reminder reminder : remindersListResponse.getReminders()) {
+			if (reminder.getText() == null || !reminder.getText().contains("Review the PR")) {
+				continue;
+			}
 			ctx.client().remindersDelete(RemindersDeleteRequest.builder()
 				.reminder(reminder.getId())
 				.token(userToken).build());
+			deleted++;
 		}
-		return ctx.ack("Successfully cleared reminders");
+
+		// Have other reminders but no PR review ones
+		if (deleted == 0) {
+			return ctx.ack("You have no PR review reminders set up.");
+		}
+
+		return ctx.ack("Successfully cleared PR review reminders");
 	}
 
 	private static Date getDateFromTimestamp(Integer timestamp) {

@@ -2,9 +2,7 @@ package com.application;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,22 +24,33 @@ public class PRLinkRespond {
 	public static Response checkForPRLinksAndRespond(EventsApiPayload<MessageEvent> payload, EventContext ctx) throws SlackApiException, IOException {
 		MessageEvent event = payload.getEvent();
 
-		String text = event.getText();
+		String message = event.getText();
 
-		if (text == null) {
+		if (message == null) {
 			return ctx.ack();
 		}
 
-		// Links and @mentions in a Slack message are always surrounded by <>
-		// e.g. <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11>
-		// If the link is embedded in text, it will show as:
-		// <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11|my PR>
-		String[] maybeLinksOrMentions = text.split("<");
+		List<String> linksPosted = getLinksPosted(message);
+
+		if (linksPosted.isEmpty()) {
+			return ctx.ack();
+		}
 
 		ConversationsMembersResponse channelMembersResponse = ctx.client()
 			.conversationsMembers(ConversationsMembersRequest.builder()
 				.channel(event.getChannel())
 				.build());
+
+		// There seems to be a bug where it can't retrieve channel info and members for DMs, so just do nothing in this case
+		if (!channelMembersResponse.isOk()) {
+			return ctx.ack();
+		}
+
+		List<String> membersToPing = getMembersToPing(message, channelMembersResponse.getMembers());
+
+		if (membersToPing.isEmpty()) {
+			return ctx.ack();
+		}
 
 		ConversationsInfoResponse channelInfoResponse = ctx.client()
 			.conversationsInfo(ConversationsInfoRequest.builder()
@@ -52,24 +61,6 @@ public class PRLinkRespond {
 			.usersInfo(UsersInfoRequest.builder()
 				.user(event.getUser())
 				.build());
-
-		// There seems to be a bug where it can't retrieve channel info and members for DMs, so just do nothing in this case
-		if (!channelInfoResponse.isOk() || !channelMembersResponse.isOk()) {
-			return ctx.ack();
-		}
-
-		Set<String> membersToPing = new HashSet<>();
-		List<String> linksPosted = new ArrayList<>();
-
-		for (String word : maybeLinksOrMentions) {
-			if (isGithubPRLink(word)) {
-				linksPosted.add(word.substring(0, getEndOfLink(word)));
-			} else if (isAtMention(word, channelMembersResponse.getMembers())) {
-				membersToPing.add(text.substring(1, text.indexOf(">")));
-			} else if (isAtHereOrAtChannel(word)) {
-				membersToPing.addAll(channelMembersResponse.getMembers());
-			}
-		}
 
 		for (String member: membersToPing) {
 			for (String link : linksPosted) {
@@ -84,6 +75,36 @@ public class PRLinkRespond {
 		}
 
 		return ctx.ack();
+	}
+
+	private static List<String> getLinksPosted(String message) {
+		List<String> linksPosted = new ArrayList<>();
+
+		// Links and @mentions in a Slack message are always surrounded by <>
+		// e.g. <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11>
+		// If the link is embedded in text, it will show as:
+		// <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11|my PR>
+		String[] maybeLinks = message.split("<");
+
+		for (String word : maybeLinks) {
+			if (isGithubPRLink(word)) {
+				linksPosted.add(word.substring(0, getEndOfLink(word)));
+			}
+		}
+
+		return linksPosted;
+	}
+
+	private static List<String> getMembersToPing(String message, List<String> channelMembers) {
+		List<String> membersToPing = new ArrayList<>();
+
+		if (hasAtHereOrAtChannel(message)) {
+			membersToPing.addAll(channelMembers);
+		} else {
+			membersToPing.addAll(getMentionedUsers(message, channelMembers));
+		}
+
+		return membersToPing;
 	}
 
 	// matches a URL ending with >, optionally with |<text> before the >, optionally with other text after, e.g:
@@ -105,14 +126,17 @@ public class PRLinkRespond {
 		}
 	}
 
-	private static boolean isAtMention(String text, List<String> channelMembers) {
-		return text.length() > 0
-			&& '@' == text.charAt(0)
-			&& text.contains(">")
-			&& channelMembers.stream().anyMatch(member -> text.substring(1, text.indexOf(">")).equals(member));
+	private static List<String> getMentionedUsers(String message, List<String> channelMembers) {
+		List<String> mentionedUsers = new ArrayList<>();
+		for (String member : channelMembers) {
+			if (message.contains(String.format("<@%s>", member))) {
+				mentionedUsers.add(member);
+			}
+		}
+		return mentionedUsers;
 	}
 
-	private static boolean isAtHereOrAtChannel(String text) {
-		return text.contains("!here") || text.contains("!channel");
+	private static boolean hasAtHereOrAtChannel(String message) {
+		return message.contains("<!here>") || message.contains("<!channel>");
 	}
 }

@@ -2,6 +2,8 @@ package com.application.webhookEvents;
 
 public class Review {
 
+	private final String testing = "this is just a test";
+
 	private User user;
 	private String submitted_at;
 	private String state;

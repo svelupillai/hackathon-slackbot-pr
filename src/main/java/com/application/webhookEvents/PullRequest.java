@@ -2,6 +2,7 @@ package com.application.webhookEvents;
 
 public class PullRequest {
 
+	private String html_url;
 	private String state;
 	private String title;
 	private String created_at;
@@ -15,6 +16,13 @@ public class PullRequest {
 	private Integer commits;
 	private Integer changed_files;
 
+	public String getHtmlUrl(){
+		return html_url;
+	}
+
+	public void setHtmlUrl(String html_url){
+		this.html_url = html_url;
+	}
 	public String getState(){
 		return this.state;
 	}

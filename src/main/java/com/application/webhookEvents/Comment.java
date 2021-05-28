@@ -7,6 +7,7 @@ public class Comment {
 	private String body;
 	private String created_at;
 	private String updated_at;
+	private String html_url;
 
 	public String getPath(){
 		return path;
@@ -46,5 +47,13 @@ public class Comment {
 
 	public void setUpdatedAt(String updated_at){
 		this.updated_at = updated_at;
+	}
+
+	public String getHtmlUrl(){
+		return html_url;
+	}
+
+	public void setHtmlUrl(String html_url){
+		this.html_url = html_url;
 	}
 }

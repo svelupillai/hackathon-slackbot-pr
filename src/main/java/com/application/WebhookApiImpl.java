@@ -55,10 +55,8 @@ public class WebhookApiImpl {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
 
-		var users = dbController.getInterestedUsers(evnt.GetUser().getLogin(), evnt.GetRepository().getFullName());
+		var users = dbController.getInterestedUsers(evnt.getUser().getLogin(), evnt.getRepository().getFullName());
 		System.out.println("IDS: " +users);
-		System.out.println("userID: " +evnt.GetUser().getLogin());
-		System.out.println("repo: " +evnt.GetRepository().getFullName());
 		Ping.pingNotification(users, slackApp, type, evnt);
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}

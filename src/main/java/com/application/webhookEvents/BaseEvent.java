@@ -7,52 +7,52 @@ public abstract class BaseEvent {
 	private Repository repository;
 	private Object organization;
 	private Object installation;
-	private String html_url;
+	private PullRequest pull_request;
 
-	public String GetAction(){
+	public String getAction(){
 		return action;
 	}
 
-	public void SetAction(String action){
+	public void setAction(String action){
 		this.action = action;
 	}
 
-	public User GetUser(){
+	public User getUser(){
 		return sender;
 	}
 
-	public void SetUser(User sender){
+	public void setUser(User sender){
 		this.sender = sender;
 	}
 
-	public Repository GetRepository(){
+	public Repository getRepository(){
 		return repository;
 	}
 
-	public String GetPRLink(){ return html_url; }
+	public PullRequest getPullRequest(){ return pull_request; }
 
-	public void SetRepository(Repository repository){
+	public void setRepository(Repository repository){
 		this.repository = repository;
 	}
 
-	public Object GetOrganization(){
+	public Object getOrganization(){
 		return organization;
 	}
 
-	public void SetOrganization(Object organization){
+	public void setOrganization(Object organization){
 		this.organization = organization;
 	}
 
-	public Object GetInstallation(){
+	public Object getInstallation(){
 		return installation;
 	}
 
-	public void SetInstallation(Object installation){
+	public void setInstallation(Object installation){
 		this.installation = installation;
 	}
 
-	public void setHtmlUrl(String html_url){
-		this.html_url = html_url;
+	public void setPullRequest(PullRequest html_url){
+		this.pull_request = pull_request;
 	}
 
 }

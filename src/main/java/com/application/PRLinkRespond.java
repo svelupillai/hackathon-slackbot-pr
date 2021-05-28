@@ -34,19 +34,24 @@ public class PRLinkRespond {
 		// <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11|my PR>
 		String[] maybeLinks = text.split("<");
 
+		ConversationsMembersResponse channelMembersResponse = ctx.client()
+			.conversationsMembers(ConversationsMembersRequest.builder()
+				.channel(event.getChannel())
+				.build());
+
+		ConversationsInfoResponse channelInfoResponse = ctx.client()
+			.conversationsInfo(ConversationsInfoRequest.builder()
+				.channel(event.getChannel())
+				.build());
+
+		// There seems to be a bug where it can't retrieve channel info and members for DMs, so just do nothing in this case
+		if (!channelInfoResponse.isOk() || !channelMembersResponse.isOk()) {
+			return ctx.ack();
+		}
+
 		for (String word : maybeLinks) {
 			if (isGithubPRLink(word)) {
 				String justTheLink = word.substring(0, getEndOfLink(word));
-
-				ConversationsMembersResponse channelMembersResponse = ctx.client()
-					.conversationsMembers(ConversationsMembersRequest.builder()
-						.channel(event.getChannel())
-						.build());
-
-				ConversationsInfoResponse channelInfoResponse = ctx.client()
-					.conversationsInfo(ConversationsInfoRequest.builder()
-						.channel(event.getChannel())
-						.build());
 
 				for (String member: channelMembersResponse.getMembers()) {
 					UsersInfoResponse usersInfoResponse = ctx.client()

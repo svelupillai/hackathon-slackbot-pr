@@ -10,6 +10,7 @@ public class User {
 	private List<String> subscribedRepoIds;
 	private List<String> subscribedUserIds;
 	private int intervalTimeInMinutes;
+	private String githubUsername;
 
 	public String getUserId() {
 		return userId;
@@ -41,5 +42,13 @@ public class User {
 
 	public void setIntervalTimeInMinutes(int intervalTimeInMinutes) {
 		this.intervalTimeInMinutes = intervalTimeInMinutes;
+	}
+
+	public String getGithubUsername() {
+		return githubUsername;
+	}
+
+	public void setGithubUsername(String githubUsername) {
+		this.githubUsername = githubUsername;
 	}
 }

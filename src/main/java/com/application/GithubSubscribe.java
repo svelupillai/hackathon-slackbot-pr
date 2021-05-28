@@ -107,4 +107,20 @@ public class GithubSubscribe {
 		return ctx.ack(String.format("You have successfully unfollowed to %s",userToUnfollow));
 
 	}
+
+	public static Response setUserName(SlashCommandContext ctx, String userId, String userName) {
+		User user = databaseController.getUser(userId);
+		if(user == null) {
+			User newUser = new User();
+			newUser.setUserId(userId);
+			newUser.setGithubUsername(userName);
+			databaseController.createUser(newUser);
+		}
+		else {
+			user.setGithubUsername(userName);
+			databaseController.updateUser(user.getUserId(), UserAdapter.userToDocument(user));
+		}
+
+		return ctx.ack(String.format("You have successfully linked your github username to %s",userName));
+	}
 }

@@ -14,5 +14,6 @@ public class Constants {
 	public static final String UNFOLLOW = "UNFOLLOW";
 	public static final String REPOS = "REPOS";
 	public static final String USERS = "USERS";
+	public static final String GITHUB = "GITHUB";
 
 }

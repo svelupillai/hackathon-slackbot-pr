@@ -18,6 +18,7 @@ public class UserAdapter {
 		return new Document(DB_FIELD_USER_ID, user.getUserId())
 			.append(DB_FIELD_SUBSCRIBED_REPO_IDS, user.getSubscribedRepoIds())
 			.append(DB_FIELD_SUBSCRIBED_USER_IDS, user.getSubscribedUserIds())
-			.append(DB_FIELD_INTERVAL_TIME_IN_MIN, user.getIntervalTimeInMinutes());
+			.append(DB_FIELD_INTERVAL_TIME_IN_MIN, user.getIntervalTimeInMinutes())
+			.append(DB_FIELD_GITHUB_USERNAME, user.getGithubUsername());
 	}
 }

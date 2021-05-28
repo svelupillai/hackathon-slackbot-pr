@@ -14,6 +14,7 @@ public class Help {
 			"`remind <link_to_PR> <reminder_text>` -> Set yourself a reminder to review a PR, e.g. remind https://github.com/foo/foo-repo/pulls/1 in 5 minutes\n\t\t" +
 			"`reminders` -> List all your PR review reminders\n\t\t" +
 			"`clear_reminders` -> Clear all your PR review reminders\n\t\t" +
+			"`github <github_username>` -> Link your gitHub username\n\t\t" +
 			"`help` -> Display this help text";
 	}
 }

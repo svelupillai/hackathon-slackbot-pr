@@ -53,10 +53,11 @@ public class DatabaseController {
 		return getUsersCollection().find(filter).first();
 	}
 
-	public List<User> getInterestedUsers(String userName, String repo) {
-		Bson userFilter = in(DB_FIELD_SUBSCRIBED_USER_IDS, userName);
+	public List<User> getInterestedUsers(String userName, String repo, boolean shouldBeSameUser, boolean sendToOwner) {
+		Bson userFilter = shouldBeSameUser ? eq(DB_FIELD_GITHUB_USERNAME, userName) : in(DB_FIELD_SUBSCRIBED_USER_IDS, userName);
 		Bson repoFilter = in(DB_FIELD_SUBSCRIBED_REPO_IDS, repo);
-		Bson filter = or(userFilter, repoFilter);
+		Bson ownerFilter = eq(DB_FIELD_GITHUB_USERNAME, userName);
+		Bson filter = sendToOwner? or(or(userFilter, repoFilter), ownerFilter) : or(userFilter, repoFilter);
 		return getUsersCollection().find(filter).into(new ArrayList<>());
 	}
 

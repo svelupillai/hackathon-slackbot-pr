@@ -15,6 +15,7 @@ public class PullRequest {
 	private Integer review_comments;
 	private Integer commits;
 	private Integer changed_files;
+	private User user;
 
 	public String getHtmlUrl(){
 		return html_url;
@@ -117,5 +118,13 @@ public class PullRequest {
 
 	public void setChangedFiles(Integer changed_files){
 		this.changed_files = changed_files;
+	}
+
+	public User getUser(){
+		return user;
+	}
+
+	public void setUser(User user){
+		this.user = user;
 	}
 }

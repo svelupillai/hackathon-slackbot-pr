@@ -44,14 +44,14 @@ public class Ping {
         return failedNames.length() > 0 ? "The following user names are invalid: " + failedNames.toString() : failedNames.toString();
     }
 
-    public static void pingNotification(List<User> users, SlackApp slackApp, String type, BaseEvent evnt) throws IOException, SlackApiException {
+    public static void pingNotification(List<User> users, SlackApp slackApp, String type, BaseEvent evnt, String link) throws IOException, SlackApiException {
         System.out.println("userID: " +evnt.getUser().getLogin());
         System.out.println("repo: " +evnt.getRepository().getFullName());
         for(var user : users) {
             ChatPostMessageResponse response = slackApp.getInstance().client().chatPostMessage(r -> r
                     .token(value)
                     .channel(user.getUserId())
-                    .text(String.format(":wave: Github notification: receiving action %s %s from user %s for %s",type, evnt.getAction(), evnt.getUser().getLogin(), evnt.getPullRequest().getHtmlUrl()))
+                    .text(String.format(":wave: Github notification: receiving action %s %s from user %s for %s",type, WebHookHelper.getUserFriendlyAction(evnt.getAction()), evnt.getUser().getLogin(), link))
             );
         }
     }

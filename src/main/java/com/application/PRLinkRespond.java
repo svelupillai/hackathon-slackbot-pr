@@ -106,7 +106,10 @@ public class PRLinkRespond {
 	}
 
 	private static boolean isAtMention(String text, List<String> channelMembers) {
-		return text.length() > 0 && '@' == text.charAt(0) && channelMembers.stream().anyMatch(member -> text.substring(1, text.indexOf(">")).equals(member));
+		return text.length() > 0
+			&& '@' == text.charAt(0)
+			&& text.contains(">")
+			&& channelMembers.stream().anyMatch(member -> text.substring(1, text.indexOf(">")).equals(member));
 	}
 
 	private static boolean isAtHereOrAtChannel(String text) {

@@ -16,6 +16,7 @@ public class SlackApp {
 	public App initSlackApp() {
 		app = new App();
 
+		System.out.print("DEMO");
 		final String USER_TOKEN = System.getenv("SLACK_USER_TOKEN");
 
 		app.command("/prpal", (req, ctx) -> {

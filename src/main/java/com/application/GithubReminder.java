@@ -20,7 +20,7 @@ public class GithubReminder {
 	public static Response remind(SlashCommandContext ctx, String userToken, String prLink, String reminderText) throws SlackApiException, IOException {
 		var logger = ctx.logger;
 		RemindersAddResponse response = ctx.client().remindersAdd(RemindersAddRequest.builder()
-			.time(reminderText) // time in seconds
+			.time(reminderText)
 			.text(String.format("Review the PR %s", prLink))
 			.token(userToken)
 			.build()

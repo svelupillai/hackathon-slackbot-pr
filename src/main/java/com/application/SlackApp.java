@@ -15,7 +15,7 @@ public class SlackApp {
 
 		final String USER_TOKEN = System.getenv("SLACK_USER_TOKEN");
 
-		app.command("/prpal2", (req, ctx) -> {
+		app.command("/prpal", (req, ctx) -> {
 			String payload = req.getPayload().getText();
 			String slackUserId = req.getPayload().getUserId();
 

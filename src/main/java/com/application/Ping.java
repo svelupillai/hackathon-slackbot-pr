@@ -1,10 +1,12 @@
 package com.application;
 
+import com.application.webhookEvents.BaseEvent;
+import com.application.webhookEvents.PullRequest;
+import com.application.webhookEvents.PullRequestEvent;
+import com.database.Model.User;
 import com.slack.api.bolt.context.builtin.SlashCommandContext;
-import com.slack.api.bolt.request.builtin.SlashCommandRequest;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
-import com.slack.api.model.User;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -26,7 +28,7 @@ public class Ping {
         List<String> names = Arrays.asList(requestNames.split(","));
         for(String name : names) {
             System.out.println(name.trim());
-            User user = result.getMembers().stream().filter(x-> x.getName().equalsIgnoreCase(name.trim())).findFirst().orElse(null);
+            com.slack.api.model.User user = result.getMembers().stream().filter(x-> x.getName().equalsIgnoreCase(name.trim())).findFirst().orElse(null);
 
             if(user != null) {
                 ChatPostMessageResponse response = ctx.client().chatPostMessage(r -> r
@@ -40,5 +42,17 @@ public class Ping {
         }
 
         return failedNames.length() > 0 ? "The following user names are invalid: " + failedNames.toString() : failedNames.toString();
+    }
+
+    public static void pingNotification(List<User> users, SlackApp slackApp, String type, BaseEvent evnt) throws IOException, SlackApiException {
+        System.out.println("userID: " +evnt.getUser().getLogin());
+        System.out.println("repo: " +evnt.getRepository().getFullName());
+        for(var user : users) {
+            ChatPostMessageResponse response = slackApp.getInstance().client().chatPostMessage(r -> r
+                    .token(value)
+                    .channel(user.getUserId())
+                    .text(String.format(":wave: Github notification: receiving action %s %s from user %s for %s",type, evnt.getAction(), evnt.getUser().getLogin(), evnt.getPullRequest().getHtmlUrl()))
+            );
+        }
     }
 }

@@ -20,17 +20,4 @@ public class UserAdapter {
 			.append(DB_FIELD_SUBSCRIBED_USER_IDS, user.getSubscribedUserIds())
 			.append(DB_FIELD_INTERVAL_TIME_IN_MIN, user.getIntervalTimeInMinutes());
 	}
-
-	public static User DocumentToUser(Document document) {
-		if(Objects.isNull(document)) {
-			return null;
-		}
-		User user = new User();
-		user.setUserId((String) document.get(DB_FIELD_USER_ID));
-		user.setSubscribedRepoIds((List<String>) document.get(DB_FIELD_SUBSCRIBED_REPO_IDS));
-		user.setSubscribedUserIds((List<String>) document.get(DB_FIELD_SUBSCRIBED_USER_IDS));
-		user.setIntervalTimeInMinutes((Integer) document.get(DB_FIELD_INTERVAL_TIME_IN_MIN));
-		return user;
-	}
-
 }

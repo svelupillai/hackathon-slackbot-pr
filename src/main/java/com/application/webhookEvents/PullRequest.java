@@ -23,7 +23,6 @@ public class PullRequest {
 	public void setHtmlUrl(String html_url){
 		this.html_url = html_url;
 	}
-
 	public String getState(){
 		return this.state;
 	}

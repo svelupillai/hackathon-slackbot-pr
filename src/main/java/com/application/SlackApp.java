@@ -8,9 +8,11 @@ import com.slack.api.model.event.MessageEvent;
 
 @Configuration
 public class SlackApp {
+
+	private static App app;
 	@Bean
 	public App initSlackApp() {
-		App app = new App();
+		app = new App();
 
 		final String USER_TOKEN = System.getenv("SLACK_USER_TOKEN");
 
@@ -77,5 +79,9 @@ public class SlackApp {
 		app.event(MessageEvent.class, PRLinkRespond::checkForPRLinksAndRespond);
 
 		return app;
+	}
+
+	 public App getInstance(){
+		return app == null ? initSlackApp() : app;
 	}
 }

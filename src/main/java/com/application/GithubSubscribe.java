@@ -16,7 +16,7 @@ public class GithubSubscribe {
 	private static DatabaseController databaseController = new DatabaseController();;
 
 	public static Response subscribeToRepository(SlashCommandContext ctx, String repositoryName, String slackUserId) {
-		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser(slackUserId));
+		User userQueried = databaseController.getUser(slackUserId);
 
 		if(Objects.isNull(userQueried)){
 			//Create new user
@@ -25,7 +25,7 @@ public class GithubSubscribe {
 
 			newUser.setSubscribedRepoIds(List.of(repositoryName));
 
-			databaseController.createUser(UserAdapter.userToDocument(newUser));
+			databaseController.createUser(newUser);
 		} else {
 			//Get user + Update with new repo name
 			List<String> subscribedRepoIds = Optional.ofNullable(userQueried.getSubscribedRepoIds())
@@ -40,7 +40,7 @@ public class GithubSubscribe {
 	}
 
 	public static Response followUser(SlashCommandContext ctx, String username, String slackUserId) {
-		User userQueried = UserAdapter.DocumentToUser(databaseController.getUser(slackUserId));
+		User userQueried = databaseController.getUser(slackUserId);
 
 		if(Objects.isNull(userQueried)){
 			//Create new user
@@ -48,7 +48,7 @@ public class GithubSubscribe {
 			newUser.setUserId(slackUserId);
 			newUser.setSubscribedUserIds(List.of(username));
 
-			databaseController.createUser(UserAdapter.userToDocument(newUser));
+			databaseController.createUser(newUser);
 		} else {
 			//Get user + Update with new repo name
 			List<String> subscribedUserIds = Optional.ofNullable(userQueried.getSubscribedUserIds())
@@ -63,7 +63,7 @@ public class GithubSubscribe {
 	}
 
 	public static Response getSubscribedRepos(SlashCommandContext ctx, String userId) {
-		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		User user = databaseController.getUser(userId);
 		if(user == null || user.getSubscribedRepoIds() == null || user.getSubscribedRepoIds().size() == 0) {
 			return ctx.ack("You are not subscribed to any repos.");
 		}
@@ -71,7 +71,7 @@ public class GithubSubscribe {
 	}
 
 	public static Response getFollowedUsers(SlashCommandContext ctx, String userId) {
-		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		User user = databaseController.getUser(userId);
 		if(user == null || user.getSubscribedUserIds() == null || user.getSubscribedUserIds().size() == 0) {
 			return ctx.ack("You are not following any users.");
 		}
@@ -79,7 +79,7 @@ public class GithubSubscribe {
 	}
 
 	public static Response unSubscribeRepo(SlashCommandContext ctx, String userId, String repo){
-		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		User user = databaseController.getUser(userId);
 		if(user == null || user.getSubscribedRepoIds() == null) {
 			return ctx.ack("You are not subscribed to any repos.");
 		}
@@ -94,7 +94,7 @@ public class GithubSubscribe {
 	}
 
 	public static Response unFollowUser(SlashCommandContext ctx, String userId, String userToUnfollow){
-		User user = UserAdapter.DocumentToUser(databaseController.getUser(userId));
+		User user = databaseController.getUser(userId);
 		if(user == null || user.getSubscribedUserIds() == null) {
 			return ctx.ack("You are not following any users.");
 		}

@@ -3,6 +3,7 @@ package com.application;
 public class Help {
 
 	public static String getHelpText() {
+		System.out.println("this is for the demo");
 		return "Usage: `/prpal <command> <args...>`\n\tCommands:\n\t\t" +
 			"`subscribe <repository_name>` -> Subscribe to a repository\n\t\t" +
 			"`follow <github_username>` -> Follow a Github user\n\t\t" +

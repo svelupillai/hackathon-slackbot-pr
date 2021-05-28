@@ -1,5 +1,7 @@
 package com.application;
 
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +15,7 @@ public class SlackApp {
 
 		final String USER_TOKEN = System.getenv("SLACK_USER_TOKEN");
 
-		app.command("/prpal", (req, ctx) -> {
+		app.command("/prpal2", (req, ctx) -> {
 			String payload = req.getPayload().getText();
 			String slackUserId = req.getPayload().getUserId();
 
@@ -50,10 +52,14 @@ public class SlackApp {
 					}
 					return ctx.ack();
 				case Constants.REMIND:
-					if (commandArgs.length < 4) {
-						return ctx.ack("Error: Must provide command in the format: remind <PR_LINK> <hours> <minutes>");
+					if (commandArgs.length < 3) {
+						return ctx.ack("Error: Must provide command in the format: remind <pr_link> <reminder_text>");
 					}
-					return GithubReminder.remind(ctx, USER_TOKEN, commandArgs[1], commandArgs[2], commandArgs[3]);
+					return GithubReminder.remind(ctx, USER_TOKEN, commandArgs[1], String.join(" ", Arrays.copyOfRange(commandArgs, 2, commandArgs.length)));
+				case Constants.REMINDERS:
+					return GithubReminder.listReminders(ctx, USER_TOKEN);
+				case Constants.CLEAR_REMINDERS:
+					return GithubReminder.deleteAllReminders(ctx, USER_TOKEN);
 				case Constants.REPOS:
 					return GithubSubscribe.getSubscribedRepos(ctx, req.getPayload().getUserId());
 				case Constants.USERS:

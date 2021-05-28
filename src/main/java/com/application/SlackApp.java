@@ -56,7 +56,7 @@ public class SlackApp {
 					return ctx.ack();
 				case Constants.REMIND:
 					if (commandArgs.length < 3) {
-						return ctx.ack("Error: Must provide command in the format: remind <pr_link> <reminder_text>");
+						return ctx.ack("Error: Must provide command in the format: remind <link_to_PR> <reminder_text>");
 					}
 					return GithubReminder.remind(ctx, USER_TOKEN, commandArgs[1], String.join(" ", Arrays.copyOfRange(commandArgs, 2, commandArgs.length)));
 				case Constants.REMINDERS:

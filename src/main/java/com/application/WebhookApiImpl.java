@@ -37,27 +37,44 @@ public class WebhookApiImpl {
 		BaseEvent evnt = null;
 		JSONObject jsonObject = new JSONObject(json);
 		String type="";
-
+		String username = "";
+		String link = null;
+		boolean shouldBeSameUser = false;
+		boolean sendToOwner = false;
 		if (jsonObject.has("number")) {
 			evnt = new Gson().fromJson(json, PullRequestEvent.class);
 			type = "pull request";
+			if(evnt.getAction() == "review_requested"){
+				System.out.println("Skipping this");
+				return new ResponseEntity<String>(HttpStatus.OK);
+			}
+			shouldBeSameUser = false;
+			sendToOwner = !evnt.getPullRequest().getUser().getLogin().equals(evnt.getUser().getLogin());
+			username = evnt.getPullRequest().getUser().getLogin();
+
 		}
 		if (jsonObject.has("comment")) {
 			System.out.println("JSONN"+ json);
 			evnt = new Gson().fromJson(json, PullRequestReviewCommentEvent.class);
 			type = "pull request comment";
+			username = evnt.getPullRequest().getUser().getLogin();
+			PullRequestReviewCommentEvent prComment = (PullRequestReviewCommentEvent)evnt;
+			link = prComment.getComment().getHtmlUrl();
+			shouldBeSameUser = true;
 		}
 		if (jsonObject.has("review")) {
 			evnt = new Gson().fromJson(json, PullRequestReviewEvent.class);
 			type = "pull request review";
+			username = evnt.getPullRequest().getUser().getLogin();
+			shouldBeSameUser = true;
 		}
 		if(evnt == null ) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
-
-		var users = dbController.getInterestedUsers(evnt.getUser().getLogin(), evnt.getRepository().getFullName());
+		link = link == null ? evnt.getPullRequest().getHtmlUrl() : link;
+		var users = dbController.getInterestedUsers(username, evnt.getRepository().getFullName(), shouldBeSameUser, sendToOwner);
 		System.out.println("IDS: " +users);
-		Ping.pingNotification(users, slackApp, type, evnt);
+		Ping.pingNotification(users, slackApp, type, evnt, link);
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 

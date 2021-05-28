@@ -70,6 +70,11 @@ public class SlackApp {
 						return ctx.ack("Error: Must provide a Github username as the second argument");
 					}
 					return GithubSubscribe.unFollowUser(ctx, req.getPayload().getUserId(), commandArgs[1]);
+				case Constants.GITHUB:
+					if (commandArgs.length <2 ){
+						return ctx.ack("Error: Must provide your Github username as the second argument");
+					}
+					return GithubSubscribe.setUserName(ctx, req.getPayload().getUserId(), commandArgs[1]);
 				default:
 					return ctx.ack("Invalid command: " + commandArgs[0]);
 			}

@@ -1,5 +1,7 @@
 package com.application;
 
+import com.slack.api.methods.SlackApiException;
+import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -13,14 +15,20 @@ import com.application.webhookEvents.PullRequestEvent;
 import com.application.webhookEvents.PullRequestReviewCommentEvent;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.util.Map;
+
 @Controller
 public class WebhookApiImpl {
 
+	static Map<String, String> env = System.getenv();
+	static String value = env.get("SLACK_BOT_TOKEN");
+	private SlackApp slackApp = new SlackApp();
 	@RequestMapping(value = "/payload",
 			produces = { "application/json" },
 			consumes = { "application/json" },
 			method = RequestMethod.POST)
-	public ResponseEntity<String> payload(HttpEntity<String> httpEntity) {
+	public ResponseEntity<String> payload(HttpEntity<String> httpEntity) throws IOException, SlackApiException {
 		String json = httpEntity.getBody();
 		BaseEvent evnt = null;
 		JSONObject jsonObject = new JSONObject(json);
@@ -32,6 +40,14 @@ public class WebhookApiImpl {
 
 		if (evnt != null)
 			System.out.println(evnt);
+
+		ChatPostMessageResponse response = slackApp.initSlackApp().client().chatPostMessage(r -> r
+				.token(value)
+				.channel("U023EC7T3HA")
+				.text(String.format(":wave: Your review is being requested on testing"))
+		);
+
+
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 

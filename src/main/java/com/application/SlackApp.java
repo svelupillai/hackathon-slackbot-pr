@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.slack.api.bolt.App;
+import com.slack.api.model.event.MessageEvent;
 
 @Configuration
 public class SlackApp {
@@ -72,6 +73,9 @@ public class SlackApp {
 					return ctx.ack("Invalid command: " + commandArgs[0]);
 			}
 		});
+
+		app.event(MessageEvent.class, PRLinkRespond::checkForPRLinksAndRespond);
+
 		return app;
 	}
 }

@@ -1,14 +1,17 @@
 package com.database.Controller;
 
-import static com.database.Util.Constants.COLLECTION_NAME_USERS;
-import static com.database.Util.Constants.DATABASE_NAME_PR_PAL;
-import static com.database.Util.Constants.OPERATION_SET;
-import static com.mongodb.client.model.Filters.eq;
-import static com.database.Util.Constants.DB_FIELD_USER_ID;
+import static com.database.Util.Constants.*;
+import static com.mongodb.client.model.Filters.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import com.database.Model.User;
+import com.mongodb.MongoClientSettings;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,8 +23,10 @@ public class DatabaseController {
 
 	private static MongoClient mongoClient;
 	private static MongoDatabase mongoDatabase;
+	private static CodecRegistry pojoCodecRegistry;
 
 	public DatabaseController() {
+		pojoCodecRegistry = org.bson.codecs.configuration.CodecRegistries.fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), org.bson.codecs.configuration.CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 		mongoClient = getClientInstance();
 		mongoDatabase = getDatabaseInstancePrPal();
 	}
@@ -31,21 +36,28 @@ public class DatabaseController {
 	}
 
 	private MongoDatabase getDatabaseInstancePrPal() {
-		return Objects.isNull(mongoDatabase) ? mongoClient.getDatabase(DATABASE_NAME_PR_PAL) : mongoDatabase;
+		return Objects.isNull(mongoDatabase) ? mongoClient.getDatabase(DATABASE_NAME_PR_PAL).withCodecRegistry(pojoCodecRegistry) : mongoDatabase;
 	}
 
 	@NotNull
-	private MongoCollection<Document> getUsersCollection() {
-		return getDatabaseInstancePrPal().getCollection(COLLECTION_NAME_USERS);
+	private MongoCollection<User> getUsersCollection() {
+		return getDatabaseInstancePrPal().getCollection(COLLECTION_NAME_USERS, User.class);
 	}
 
-	public void createUser(Document newDocument) {
-		getUsersCollection().insertOne(newDocument);
+	public void createUser(User user) {
+		getUsersCollection().insertOne(user);
 	}
 
-	public Document getUser(String userId) {
+	public User getUser(String userId) {
 		Bson filter = eq(DB_FIELD_USER_ID, userId);
 		return getUsersCollection().find(filter).first();
+	}
+
+	public List<User> getInterestedUsers(String userName, String repo) {
+		Bson userFilter = in(DB_FIELD_SUBSCRIBED_USER_IDS, userName);
+		Bson repoFilter = in(DB_FIELD_SUBSCRIBED_REPO_IDS, repo);
+		Bson filter = or(userFilter, repoFilter);
+		return getUsersCollection().find(filter).into(new ArrayList<>());
 	}
 
 	public void updateUser(String userIdToUpdate, Document newDocument) {

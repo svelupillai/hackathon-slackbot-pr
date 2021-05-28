@@ -1,8 +1,11 @@
 package com.database.Model;
 
+import org.bson.codecs.pojo.annotations.BsonId;
+
 import java.util.List;
 
 public class User {
+	@BsonId
 	private String userId;
 	private List<String> subscribedRepoIds;
 	private List<String> subscribedUserIds;

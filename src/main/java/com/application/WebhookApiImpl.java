@@ -1,5 +1,6 @@
 package com.application;
 
+import com.database.Controller.DatabaseController;
 import com.slack.api.methods.SlackApiException;
 import com.slack.api.methods.response.chat.ChatPostMessageResponse;
 import org.json.JSONObject;
@@ -24,7 +25,9 @@ public class WebhookApiImpl {
 
 	static Map<String, String> env = System.getenv();
 	static String value = env.get("SLACK_BOT_TOKEN");
+	static DatabaseController dbController = new DatabaseController();
 	private SlackApp slackApp = new SlackApp();
+
 	@RequestMapping(value = "/payload",
 			produces = { "application/json" },
 			consumes = { "application/json" },
@@ -33,24 +36,30 @@ public class WebhookApiImpl {
 		String json = httpEntity.getBody();
 		BaseEvent evnt = null;
 		JSONObject jsonObject = new JSONObject(json);
+		String type="";
 
-		if (jsonObject.has("number"))
+		if (jsonObject.has("number")) {
 			evnt = new Gson().fromJson(json, PullRequestEvent.class);
-		if (jsonObject.has("comment"))
+			type = "pull request";
+		}
+		if (jsonObject.has("comment")) {
+			System.out.println("JSONN"+ json);
 			evnt = new Gson().fromJson(json, PullRequestReviewCommentEvent.class);
-		if (jsonObject.has("review"))
+			type = "pull request comment";
+		}
+		if (jsonObject.has("review")) {
 			evnt = new Gson().fromJson(json, PullRequestReviewEvent.class);
+			type = "pull request review";
+		}
+		if(evnt == null ) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
 
-		if (evnt != null)
-			System.out.println(evnt);
-
-		ChatPostMessageResponse response = slackApp.initSlackApp().client().chatPostMessage(r -> r
-				.token(value)
-				.channel("U023EC7T3HA")
-				.text(String.format(":wave: Your review is being requested on testing"))
-		);
-
-
+		var users = dbController.getInterestedUsers(evnt.GetUser().getLogin(), evnt.GetRepository().getFullName());
+		System.out.println("IDS: " +users);
+		System.out.println("userID: " +evnt.GetUser().getLogin());
+		System.out.println("repo: " +evnt.GetRepository().getFullName());
+		Ping.pingNotification(users, slackApp, type, evnt);
 		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 

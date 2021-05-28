@@ -7,6 +7,7 @@ public abstract class BaseEvent {
 	private Repository repository;
 	private Object organization;
 	private Object installation;
+	private String html_url;
 
 	public String GetAction(){
 		return action;
@@ -28,6 +29,8 @@ public abstract class BaseEvent {
 		return repository;
 	}
 
+	public String GetPRLink(){ return html_url; }
+
 	public void SetRepository(Repository repository){
 		this.repository = repository;
 	}
@@ -46,6 +49,10 @@ public abstract class BaseEvent {
 
 	public void SetInstallation(Object installation){
 		this.installation = installation;
+	}
+
+	public void setHtmlUrl(String html_url){
+		this.html_url = html_url;
 	}
 
 }

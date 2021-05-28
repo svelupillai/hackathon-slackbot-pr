@@ -7,9 +7,11 @@ import com.slack.api.bolt.App;
 
 @Configuration
 public class SlackApp {
+
+	private static App app;
 	@Bean
 	public App initSlackApp() {
-		App app = new App();
+		app = new App();
 
 		final String USER_TOKEN = System.getenv("SLACK_USER_TOKEN");
 
@@ -73,5 +75,9 @@ public class SlackApp {
 			}
 		});
 		return app;
+	}
+
+	 public App getInstance(){
+		return app == null ? initSlackApp() : app;
 	}
 }

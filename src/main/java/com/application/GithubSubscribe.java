@@ -104,7 +104,7 @@ public class GithubSubscribe {
 		}
 		followedUsers.remove(userToUnfollow);
 		databaseController.updateUser(userId, UserAdapter.userToDocument(user));
-		return ctx.ack(String.format("You have successfully unfollowed to %s",userToUnfollow));
+		return ctx.ack(String.format("You have successfully unfollowed %s",userToUnfollow));
 
 	}
 

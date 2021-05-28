@@ -51,7 +51,7 @@ public class Ping {
             ChatPostMessageResponse response = slackApp.getInstance().client().chatPostMessage(r -> r
                     .token(value)
                     .channel(user.getUserId())
-                    .text(String.format(":wave: Github notification: receiving action %s %s from user %s for %s",type, evnt.getAction(), evnt.getUser().getLogin(), link))
+                    .text(String.format(":wave: Github notification: receiving action %s %s from user %s for %s",type, WebHookHelper.getUserFriendlyAction(evnt.getAction()), evnt.getUser().getLogin(), link))
             );
         }
     }

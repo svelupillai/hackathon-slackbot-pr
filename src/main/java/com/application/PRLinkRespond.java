@@ -1,6 +1,10 @@
 package com.application;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,7 +22,7 @@ import com.slack.api.model.event.MessageEvent;
 
 public class PRLinkRespond {
 
-	// Parses messages for GitHub PR links and notifies everyone in the channel
+	// Parses messages for GitHub PR links and notifies everyone mentioned
 	public static Response checkForPRLinksAndRespond(EventsApiPayload<MessageEvent> payload, EventContext ctx) throws SlackApiException, IOException {
 		MessageEvent event = payload.getEvent();
 
@@ -28,11 +32,11 @@ public class PRLinkRespond {
 			return ctx.ack();
 		}
 
-		// Links in a Slack message are always surrounded by <>
+		// Links and @mentions in a Slack message are always surrounded by <>
 		// e.g. <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11>
 		// If the link is embedded in text, it will show as:
 		// <https://github.com/svelupillai/hackathon-slackbot-pr/pull/11|my PR>
-		String[] maybeLinks = text.split("<");
+		String[] maybeLinksOrMentions = text.split("<");
 
 		ConversationsMembersResponse channelMembersResponse = ctx.client()
 			.conversationsMembers(ConversationsMembersRequest.builder()
@@ -44,31 +48,41 @@ public class PRLinkRespond {
 				.channel(event.getChannel())
 				.build());
 
+		UsersInfoResponse usersInfoResponse = ctx.client()
+			.usersInfo(UsersInfoRequest.builder()
+				.user(event.getUser())
+				.build());
+
 		// There seems to be a bug where it can't retrieve channel info and members for DMs, so just do nothing in this case
 		if (!channelInfoResponse.isOk() || !channelMembersResponse.isOk()) {
 			return ctx.ack();
 		}
 
-		for (String word : maybeLinks) {
+		Set<String> membersToPing = new HashSet<>();
+		List<String> linksPosted = new ArrayList<>();
+
+		for (String word : maybeLinksOrMentions) {
 			if (isGithubPRLink(word)) {
-				String justTheLink = word.substring(0, getEndOfLink(word));
-
-				for (String member: channelMembersResponse.getMembers()) {
-					UsersInfoResponse usersInfoResponse = ctx.client()
-						.usersInfo(UsersInfoRequest.builder()
-							.user(event.getUser())
-							.build());
-
-					ctx.client().chatPostMessage(r -> r
-						.channel(member)
-						.text(String.format("Hey! %s just posted a PR link in #%s: %s",
-							usersInfoResponse.getUser().getRealName(),
-							channelInfoResponse.getChannel().getName(),
-							justTheLink))
-					);
-				}
+				linksPosted.add(word.substring(0, getEndOfLink(word)));
+			} else if (isAtMention(word, channelMembersResponse.getMembers())) {
+				membersToPing.add(text.substring(1, text.indexOf(">")));
+			} else if (isAtHereOrAtChannel(word)) {
+				membersToPing.addAll(channelMembersResponse.getMembers());
 			}
 		}
+
+		for (String member: membersToPing) {
+			for (String link : linksPosted) {
+				ctx.client().chatPostMessage(r -> r
+					.channel(member)
+					.text(String.format("Hey! %s just posted a PR link in #%s: %s",
+						usersInfoResponse.getUser().getRealName(),
+						channelInfoResponse.getChannel().getName(),
+						link))
+				);
+			}
+		}
+
 		return ctx.ack();
 	}
 
@@ -89,5 +103,13 @@ public class PRLinkRespond {
 		} else {
 			return link.indexOf(">");
 		}
+	}
+
+	private static boolean isAtMention(String text, List<String> channelMembers) {
+		return text.length() > 0 && '@' == text.charAt(0) && channelMembers.stream().anyMatch(member -> text.substring(1, text.indexOf(">")).equals(member));
+	}
+
+	private static boolean isAtHereOrAtChannel(String text) {
+		return text.contains("!here") || text.contains("!channel");
 	}
 }
